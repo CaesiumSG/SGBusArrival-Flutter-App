@@ -60,22 +60,22 @@ flutter:
   assets:
     # Assets for built-in Fallover Cache
     - assets/busRes.json
-    # Assets for Go-Ahead-Singapore Buses
-    - assets/graphics/Bus Icons/GAS/Icon-GAS-normal.png
-    - assets/graphics/Bus Icons/GAS/Icon-GAS-DoubleDeckerbus.png
-    - assets/graphics/Bus Icons/GAS/Icon-GAS-ArticulatedBus.png
-    # Assets for Singapore Mass Rapid Transit Buses
-    - assets/graphics/Bus Icons/SMRT/Icon-SMRT-normal.png
-    - assets/graphics/Bus Icons/SMRT/Icon-SMRT-DoubleDeckerbus.png
-    - assets/graphics/Bus Icons/SMRT/Icon-SMRT-ArticulatedBus.png
-    # Assets for Singapore Bus Services Buses
-    - assets/graphics/Bus Icons/SBS/Icon-SBS-normal.png
-    - assets/graphics/Bus Icons/SBS/Icon-SBS-DoubleDeckerbus.png
-    - assets/graphics/Bus Icons/SBS/Icon-SBS-ArticulatedBus.png
-    # Assets for Tower Transit Singapore Buses
-    - assets/graphics/Bus Icons/TTS/Icon-TTS-normal.png
-    - assets/graphics/Bus Icons/TTS/Icon-TTS-DoubleDeckerbus.png
-    - assets/graphics/Bus Icons/TTS/Icon-TTS-ArticulatedBus.png
+#    # Assets for Go-Ahead-Singapore Buses
+#    - assets/graphics/Bus Icons/GAS/Icon-GAS-normal.png
+#    - assets/graphics/Bus Icons/GAS/Icon-GAS-DoubleDeckerbus.png
+#    - assets/graphics/Bus Icons/GAS/Icon-GAS-ArticulatedBus.png
+#    # Assets for Singapore Mass Rapid Transit Buses
+#    - assets/graphics/Bus Icons/SMRT/Icon-SMRT-normal.png
+#    - assets/graphics/Bus Icons/SMRT/Icon-SMRT-DoubleDeckerbus.png
+#    - assets/graphics/Bus Icons/SMRT/Icon-SMRT-ArticulatedBus.png
+#    # Assets for Singapore Bus Services Buses
+#    - assets/graphics/Bus Icons/SBS/Icon-SBS-normal.png
+#    - assets/graphics/Bus Icons/SBS/Icon-SBS-DoubleDeckerbus.png
+#    - assets/graphics/Bus Icons/SBS/Icon-SBS-ArticulatedBus.png
+#    # Assets for Tower Transit Singapore Buses
+#    - assets/graphics/Bus Icons/TTS/Icon-TTS-normal.png
+#    - assets/graphics/Bus Icons/TTS/Icon-TTS-DoubleDeckerbus.png
+#    - assets/graphics/Bus Icons/TTS/Icon-TTS-ArticulatedBus.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

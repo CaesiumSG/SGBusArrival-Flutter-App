@@ -4,8 +4,6 @@ import 'dart:io';
 import 'package:fuzzywuzzy/fuzzywuzzy.dart' as fuzzy;
 import 'package:path_provider/path_provider.dart';
 
-import 'busarrival.dart';
-
 var results = [];
 var descArray = [];
 // class Cache{
@@ -63,7 +61,7 @@ Future determineSearchTermType(String food) async {
 }
 
 var rawJson;
-bool cacheFlag = false;
+var cacheFlag = false;
 List<String> newDescArray = [];
 var toSendBack = [];
 
@@ -91,22 +89,30 @@ fuzzySearch(String term) async {
         limit: 15,
         cutoff: 0,
       );
-      var found = results[0].index;
-      found = rawJson[found];
-      getRequest(found["stopCode"], found["stopLat"], found["stopLong"]);
-      return found;
+      // print(results);
+      var querySorted = [];
+      for (var resultIndex = 0; resultIndex < results.length; resultIndex++) {
+        querySorted.add(rawJson[results[resultIndex].index]);
+      }
+      return querySorted;
+      // var found = results[0].index;
+      // found = rawJson[found];
+      // var parsed = await getRequest(
+      //     found["stopCode"], found["stopLat"], found["stopLong"], rawJson);
+      // return parsed;
       break;
     case 2:
       break;
     case 3:
-      var found = (rawJson.toList().firstWhere((i) => i['stopCode'] == term));
+      var found =
+          await (rawJson.toList().firstWhere((i) => i['stopCode'] == term));
       if (found == -1) return [];
-      toSendBack.add(found);
-      found = [];
-      print(found);
-      print(toSendBack);
-      return (toSendBack);
-    // if (isNum == 3){
-
+      return [found];
+    // toSendBack.add(found);
+    // found = [];
+    // print(found);
+    // var parsed = await getRequest(
+    //     found["stopCode"], found["stopLat"], found["stopLong"], rawJson);
+    // print(parsed);
   }
 }

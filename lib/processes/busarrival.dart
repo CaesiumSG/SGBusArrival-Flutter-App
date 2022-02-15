@@ -5,7 +5,9 @@ import 'dart:convert' as convert;
 
 import 'package:http/http.dart' as http;
 
-getRequest(stop, lat, long) async {
+import 'convertreadable.dart';
+
+getRequest(stop, lat, long, rawJson) async {
   call(website) async {
     var client = http.Client();
     var header = "1OVczLbdTU2lTTpTNXbMiA==";
@@ -18,11 +20,12 @@ getRequest(stop, lat, long) async {
 
   var url = Uri.parse(
       'http://datamall2.mytransport.sg/ltaodataservice/BusArrivalv2?BusStopCode=${stop}&ServiceNo=');
-  print(url);
-
   var requestdata = await call(url);
   // print(requestdata);
-  var grabgrab = requestdata["services"];
-  if (!grabgrab) return [];
-  for (var a = 0; a < grabgrab.length; a++) {}
+  var output = await resultParser(requestdata, rawJson);
+  // return output;
+  for (var i = 0; i < output.length; i++) {
+    print(output[i]);
+  }
+  // for (var a = 0; a < grabgrab.length; a++) {}
 }

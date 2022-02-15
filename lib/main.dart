@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+
 import 'processes/background.dart';
+import 'processes/busarrival.dart';
 import 'processes/fuzzySearch.dart';
 
 void main() {
@@ -32,10 +34,12 @@ class MyStatefulWidget extends StatefulWidget {
 }
 
 class _MyStatefulWidgetState extends State<MyStatefulWidget> {
+  var rawJson = [];
+  var results = [];
   int _selectedIndex = 0;
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  static const List<Widget> _widgetOptions = <Widget>[
+  static List<Widget> _widgetOptions = <Widget>[
     Text(
       'Enter at least 2 characters!',
       style: optionStyle,
@@ -54,6 +58,10 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  void updateList(list) {
+    setState(() {});
   }
 
   @override
@@ -75,7 +83,9 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                     ),
                     title: TextField(
                       onChanged: (smth) {
-                        fuzzySearch(smth);
+                        results = [];
+                        results = fuzzySearch(smth);
+                        setState(() {});
                       },
                       decoration: InputDecoration(
                         hintText:
@@ -113,7 +123,43 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
         ],
       ),
       body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
+        child: ListView.separated(
+          padding: const EdgeInsets.all(8),
+          itemCount: results.length,
+          itemBuilder: (BuildContext context, int index) {
+            return ListTile(
+              title: Text(
+                  '${results[index]["desc"]} - ${results[index]["stopCode"]}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 25,
+                  )),
+              tileColor: Colors.black,
+              onTap: () async {
+                var rawJson = await readJson();
+                var req = await getRequest(
+                    results[index]["stopCode"],
+                    results[index]["stopLat"],
+                    results[index]["stopLong"],
+                    rawJson);
+                print(req);
+              }, // Handle your onTap here.
+            );
+            // return Container(
+            //   height: 50,
+            //   color: Colors.black,
+            //   child: Center(
+            //       child: Text(
+            //           '${results[index]["desc"]} - ${results[index]["stopCode"]}',
+            //           style: TextStyle(
+            //             color: Colors.white,
+            //             fontSize: 25,
+            //           ))),
+            // );
+          },
+          separatorBuilder: (BuildContext context, int index) =>
+              const Divider(),
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[

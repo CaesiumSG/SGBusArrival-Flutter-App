@@ -55,6 +55,5 @@ class Database {
     var db = new Database();
     await db.initialise();
     // do stuff with db here
-    print("done");
   }
 }
