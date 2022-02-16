@@ -21,11 +21,6 @@ getRequest(stop, lat, long, rawJson) async {
   var url = Uri.parse(
       'http://datamall2.mytransport.sg/ltaodataservice/BusArrivalv2?BusStopCode=${stop}&ServiceNo=');
   var requestdata = await call(url);
-  // print(requestdata);
-  var output = await resultParser(requestdata, rawJson);
-  // return output;
-  for (var i = 0; i < output.length; i++) {
-    print(output[i]);
-  }
-  // for (var a = 0; a < grabgrab.length; a++) {}
+  var output = await resultParser(requestdata, rawJson); //returns an array
+  return output;
 }

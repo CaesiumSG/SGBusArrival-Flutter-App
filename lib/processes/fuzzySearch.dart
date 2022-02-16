@@ -6,20 +6,6 @@ import 'package:path_provider/path_provider.dart';
 
 var results = [];
 var descArray = [];
-// class Cache{
-//   late String code;
-//   late String road;
-//   late String desc;
-//   late String lat;
-//   late String long;
-//   Cache.fromJson(Map json) {
-//     this.code = json['stopCode'];
-//     this.desc = json['desc'];
-//     this.road = json['roadName'];
-//     this.lat = json['lat'];
-//     this.long = json['long'];
-//   }
-// }
 
 Future<String> get _localPath async {
   final directory = await getApplicationDocumentsDirectory();
@@ -44,11 +30,6 @@ Future readJson() async {
     // If encountering an error, return 0
     return 0;
   }
-  //
-  //
-  // String response = await rootBundle.loadString('assets/busRes.json');
-  // var rawJson = await json.decode(response);
-  // return rawJson;
 }
 
 Future determineSearchTermType(String food) async {
@@ -95,12 +76,6 @@ fuzzySearch(String term) async {
         querySorted.add(rawJson[results[resultIndex].index]);
       }
       return querySorted;
-      // var found = results[0].index;
-      // found = rawJson[found];
-      // var parsed = await getRequest(
-      //     found["stopCode"], found["stopLat"], found["stopLong"], rawJson);
-      // return parsed;
-      break;
     case 2:
       break;
     case 3:
@@ -108,11 +83,5 @@ fuzzySearch(String term) async {
           await (rawJson.toList().firstWhere((i) => i['stopCode'] == term));
       if (found == -1) return [];
       return [found];
-    // toSendBack.add(found);
-    // found = [];
-    // print(found);
-    // var parsed = await getRequest(
-    //     found["stopCode"], found["stopLat"], found["stopLong"], rawJson);
-    // print(parsed);
   }
 }

@@ -1,3 +1,4 @@
+import 'package:busarrival_utilities/pages/renderbusarrivalpage.dart';
 import 'package:flutter/material.dart';
 
 import 'processes/background.dart';
@@ -19,9 +20,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       title: _title,
       home: MyStatefulWidget(),
+      theme: ThemeData(scaffoldBackgroundColor: Color(0xff030303)),
     );
   }
 }
@@ -82,9 +84,9 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                       size: 28,
                     ),
                     title: TextField(
-                      onChanged: (smth) {
+                      onChanged: (smth) async {
                         results = [];
-                        results = fuzzySearch(smth);
+                        results = await fuzzySearch(smth);
                         setState(() {});
                       },
                       decoration: InputDecoration(
@@ -124,18 +126,27 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       ),
       body: Center(
         child: ListView.separated(
-          padding: const EdgeInsets.all(8),
+          // padding: const EdgeInsets.all(8),
           itemCount: results.length,
           itemBuilder: (BuildContext context, int index) {
             return ListTile(
-              title: Text(
-                  '${results[index]["desc"]} - ${results[index]["stopCode"]}',
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+                side: BorderSide(color: Color(0xff242526)),
+              ),
+              title: Text('${results[index]["desc"]}',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 25,
                   )),
-              tileColor: Colors.black,
+              subtitle: Text(
+                  '${results[index]["stopCode"]} • ${results[index]["roadName"]}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                  )),
+              tileColor: Color(0xff241e30),
               onTap: () async {
+                print(index);
                 var rawJson = await readJson();
                 var req = await getRequest(
                     results[index]["stopCode"],
@@ -143,19 +154,16 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                     results[index]["stopLong"],
                     rawJson);
                 print(req);
-              }, // Handle your onTap here.
+                await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => busArrivalRenderScreen(
+                        result: req.toList(),
+                        stopDetails: results[index],
+                      ),
+                    ));
+              },
             );
-            // return Container(
-            //   height: 50,
-            //   color: Colors.black,
-            //   child: Center(
-            //       child: Text(
-            //           '${results[index]["desc"]} - ${results[index]["stopCode"]}',
-            //           style: TextStyle(
-            //             color: Colors.white,
-            //             fontSize: 25,
-            //           ))),
-            // );
           },
           separatorBuilder: (BuildContext context, int index) =>
               const Divider(),
@@ -179,6 +187,8 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.amber[800],
         onTap: _onItemTapped,
+        backgroundColor: const Color(0xff242526),
+        unselectedItemColor: Colors.white,
       ),
     );
   }

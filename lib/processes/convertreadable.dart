@@ -1,10 +1,6 @@
 import 'dart:core';
 
 import 'package:flutter/material.dart';
-import 'package:hexcolor/hexcolor.dart';
-
-//assume we already have some sort of a search feature
-//also assume that we already have some sort of a result that we want to query for
 
 //TODO: Add elements for output
 
@@ -37,39 +33,10 @@ loadReadable(dispVar) async {
   } else if (dispVar == "LSD") {
     dispVar = Colors.red;
   } else {
-    dispVar = Colors.black;
+    dispVar = Colors.white;
   }
-  // return Icon(
-  //   Icons.airline_seat_recline_normal_rounded,
-  //   color: dispVar,
-  //   size: 24,
-  // );
   return dispVar;
 }
-
-parseEmbedColor(busCompany) async {
-  if (busCompany == "SBST") {
-    return HexColor("#8B008B");
-  } else if (busCompany == "TTS") {
-    return HexColor("#007934");
-  } else if (busCompany == "SMRT") {
-    return HexColor("#FF0000");
-  } else if (busCompany == "GAS") {
-    return HexColor("#f1c400");
-  } else {
-    return Colors.black;
-  }
-}
-
-// parseBusTypeOperator(dispVar, busCompany) async {
-//   if (dispVar == "SD") dispVar = "normal";
-//   if (dispVar == "DD") dispVar = "DoubleDeckerbus";
-//   if (dispVar == "BD") dispVar = "ArticulatedBus";
-//   print('assets/graphics/Bus Icons/$busCompany/Icon-$busCompany-$dispVar');
-//   return Image(
-//       image: AssetImage(
-//           'assets/graphics/Bus Icons/$busCompany/Icon-$busCompany-$dispVar'));
-// }
 
 typeReadable(dispVar) async {
   if (dispVar == "SD") return "Single";
@@ -91,7 +58,7 @@ timeReadable(dispVar, space) async {
     if (dispVar <= 1)
       dispVar = "ARR";
     else
-      dispVar = '$dispVar Minutes';
+      dispVar = '$dispVar';
   }
   if (dispVar.isEmpty) dispVar = "-";
   return Text(dispVar,
@@ -101,33 +68,14 @@ timeReadable(dispVar, space) async {
       ));
 }
 
-// busCompanyReadable(operator) async {
-//   if (operator == "SMRT")
-//     return "<:SMRT:838048960752254978>";
-//   else if (operator == "SBST")
-//     return "<:SBS:838048961045856306>";
-//   else if (operator == "GAS")
-//     return "<:GAS:838048960937197578>";
-//   else if (operator == "TTS")
-//     return "<:TTS:838048960932741201>";
-//   else
-//     return "<:singledeckltasvg:793042118465159201>";
-// }
-
 findStopData(cache, code) async {
   return await (cache.toList().firstWhere((i) => i['stopCode'] == code));
 }
 
 resultParser(apiResponse, cache) async {
   var pushed = [];
-  // var fetchedData = await apiResponse
-  //     .toList()['Services']
-  //     .firstWhere((x) => x['serviceNo'] == busNum);
-  // if (!fetchedData) return null;
   for (int x = 0; x < apiResponse['Services'].length; x++) {
-    // print('$x of $')
     var fetchedData = await apiResponse['Services'][x];
-    // print(fetchedData);
     var originData =
         await findStopData(cache, fetchedData["NextBus"]["OriginCode"]);
     var destinationData =
@@ -151,33 +99,19 @@ resultParser(apiResponse, cache) async {
     var thirdType = await typeReadable(fetchedData["NextBus3"]["Type"]);
 
     var built = {
-      ["bus_Number"]: apiResponse['Services'][x]['ServiceNo'],
-      ["heading_From"]: originData,
-      ["heading_To"]: destinationData,
-      ["first_Arrival"]: firstTime,
-      ["first_isAccessable"]: firstFeature,
-      ["first_busType"]: firstType,
-      ["second_Arrival"]: secondTime,
-      ["second_isAccessable"]: secondFeature,
-      ["second_busType"]: secondType,
-      ["third_Arrival"]: thirdTime,
-      ["third_isAccessable"]: thirdFeature,
-      ["third_busType"]: thirdType,
+      "bus_Number": apiResponse['Services'][x]['ServiceNo'],
+      "heading_From": originData,
+      "heading_To": destinationData,
+      "first_Arrival": firstTime,
+      "first_isAccessable": firstFeature,
+      "first_busType": firstType,
+      "second_Arrival": secondTime,
+      "second_isAccessable": secondFeature,
+      "second_busType": secondType,
+      "third_Arrival": thirdTime,
+      "third_isAccessable": thirdFeature,
+      "third_busType": thirdType,
     };
-    //
-    // pushed.add({
-    //   originData,
-    //   destinationData,
-    //   firstTime,
-    //   firstFeature,
-    //   firstType,
-    //   secondTime,
-    //   secondFeature,
-    //   secondType,
-    //   thirdTime,
-    //   thirdFeature,
-    //   thirdType,
-    // });
     pushed.add(built);
   }
 
