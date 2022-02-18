@@ -40,6 +40,7 @@ dependencies:
   sqflite: ^2.0.2
   hexcolor: ^2.0.6
   flutter_slidable: ^1.2.0
+  location: ^4.3.0
 
 
 dev_dependencies:

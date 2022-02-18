@@ -12,13 +12,13 @@ featureReadable(dispVar) async {
   if (dispVar == "WAB") {
     dispVar = const Icon(
       Icons.accessible_rounded,
-      color: Colors.black,
+      color: Colors.white,
       size: 24,
     );
   } else {
     dispVar = const Icon(
       Icons.not_accessible_rounded,
-      color: Colors.black,
+      color: Colors.white,
       size: 24,
     );
   }

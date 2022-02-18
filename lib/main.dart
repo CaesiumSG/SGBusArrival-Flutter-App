@@ -1,20 +1,32 @@
+import 'dart:math';
+
 import 'package:busarrival_utilities/pages/renderbusarrivalpage.dart';
 import 'package:flutter/material.dart';
+import 'package:location/location.dart';
 
 import 'processes/background.dart';
 import 'processes/busarrival.dart';
 import 'processes/fuzzySearch.dart';
 
-void main() {
+void main() async {
   background();
-  runApp(const MyApp());
+  // Location location = Location();
+  // location.requestService();
+  // var serviceEnabled;
+  // var perms;
+  // serviceEnabled = await location.serviceEnabled();
+  // perms = await location.hasPermission();
+  // if (perms == PermissionStatus.denied || !serviceEnabled) {
+  //   perms = await location.requestPermission();
+  // }
+  runApp(const mainPage());
 }
 
 Icon customIcon = const Icon(Icons.search);
 Widget customSearchBar = const Text('busArrival Utilities');
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class mainPage extends StatelessWidget {
+  const mainPage({Key? key}) : super(key: key);
 
   static const String _title = 'busarrival Utilities';
 
@@ -22,22 +34,23 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: _title,
-      home: MyStatefulWidget(),
+      home: homePageWidget(),
       theme: ThemeData(scaffoldBackgroundColor: Color(0xff030303)),
     );
   }
 }
 
-class MyStatefulWidget extends StatefulWidget {
-  const MyStatefulWidget({Key? key}) : super(key: key);
+class homePageWidget extends StatefulWidget {
+  const homePageWidget({Key? key}) : super(key: key);
 
   @override
-  State<MyStatefulWidget> createState() => _MyStatefulWidgetState();
+  State<homePageWidget> createState() => homepageState();
 }
 
-class _MyStatefulWidgetState extends State<MyStatefulWidget> {
+class homepageState extends State<homePageWidget> {
   var rawJson = [];
   var results = [];
+  Location location = Location();
   int _selectedIndex = 0;
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
@@ -60,6 +73,95 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  fillBody() async {
+    bool _serviceEnabled;
+    PermissionStatus _permissionGranted;
+    LocationData _locationData;
+
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        return const Text(
+            'Enable Location Services to see your closes bus stops!',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 15,
+            ));
+      }
+    }
+
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        return const Center(
+            child: Text(
+                'Grant Location Services Access to see your closes bus stops!',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                )));
+      }
+    }
+
+    getDist(phoneLat, phoneLong, targetLat, targetLong) {
+      var x = acos(sin(phoneLat * pi / 180) * sin(targetLat * pi / 180) +
+              cos(phoneLat * pi / 180) *
+                  cos(targetLat * pi / 180) *
+                  (sin(phoneLong * pi / 180) * sin(targetLong * pi / 180) +
+                      cos(phoneLong * pi / 180) * cos(targetLong * pi / 180))) *
+          6371000;
+      return x.round();
+    }
+
+    _locationData = await location.getLocation();
+    var locLat = _locationData.latitude;
+    var locLong = _locationData.longitude;
+    print(locLat);
+    print(locLong);
+    var maxRad = 400;
+    var theList = await readJson();
+    var find = await theList
+        .toList()
+        .where((x) =>
+            getDist(locLat, locLong, x["stopLat"], x["stopLong"]) < maxRad)
+        .toList();
+    //find is an array of objects
+    var distArray = []; //temp array 1
+    var tempArray = []; //temp array 2
+    for (var aa = 0; aa < find.length; aa++) {
+      find[aa]["distFromPhone"] = getDist(
+          locLat,
+          locLong,
+          find[aa]["stopLat"],
+          find[aa][
+              "stopLong"]); //adds a distancefromphone property into original array (find)
+      distArray.add(getDist(
+          locLat,
+          locLong,
+          find[aa]["stopLat"],
+          find[aa][
+              "stopLong"])); //adds the distancefromphone value into a new temporary array
+    }
+    distArray.sort(); //sort the values in the temp array
+    for (var newIndex = 0; newIndex < distArray.length; newIndex++) {
+      //for each value in the new array
+      var tempObj = find.where((x) =>
+          x["distFromPhone"] ==
+          distArray[
+              newIndex]); //match object to value in the new array in ascending order
+      tempArray.add(tempObj); //adds objects into another new temp array
+    }
+    //by this point the array of objects is sorted, so just clone the final temp array into the original array
+    find = tempArray;
+    //end of Brian sort, time complexity is inf. anyways
+
+/*    for (var aaa = 0; aaa < find.length; aaa++) {
+      print(find[aaa]);
+    }*/
   }
 
   void updateList(list) {
@@ -114,7 +216,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
             },
             icon: customIcon,
           ),
-          SizedBox(width: 15),
+          SizedBox(width: 10),
           IconButton(
             icon: Icon(
               Icons.settings,
@@ -153,6 +255,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                     results[index]["stopLat"],
                     results[index]["stopLong"],
                     rawJson);
+                fillBody();
                 print(req);
                 await Navigator.push(
                     context,

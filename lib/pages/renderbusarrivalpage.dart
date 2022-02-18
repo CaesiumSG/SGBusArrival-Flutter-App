@@ -42,89 +42,124 @@ class busTileState extends State<busArrivalRenderScreen> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: Text(stopDetails["desc"]),
-          centerTitle: true,
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(
-                Icons.refresh_rounded,
-                color: Color(0xff242526),
+          appBar: AppBar(
+            title: Center(
+                child: Text(
+              stopDetails["desc"] +
+                  '\n(${stopDetails["stopCode"]} • ${stopDetails["roadName"]})',
+              textAlign: TextAlign.center,
+            )),
+            centerTitle: true,
+            actions: <Widget>[
+              IconButton(
+                icon: Icon(
+                  Icons.refresh_rounded,
+                  color: Color(0xff242526),
+                ),
+                onPressed: refreshData,
               ),
-              onPressed: refreshData,
-            ),
-          ],
-          bottom: PreferredSize(
-              child: Text(
-                  '${stopDetails["stopCode"]} • ${stopDetails["roadName"]}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                  )),
-              preferredSize: Size.fromHeight(-5)),
-        ),
-        body: ListView.separated(
-          itemCount: result.length,
-          itemBuilder: (context, index) {
-            return ListTile(
-              // visualDensity: VisualDensity.comfortable,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-                side: BorderSide(color: Color(0xff242526)),
-              ),
-              title: Row(
-                children: <Widget>[
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Text('${result[index]["bus_Number"]}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 25,
-                          ))
-                    ],
+            ],
+            // bottom: PreferredSize(
+            //     child: Text(
+            //         '${stopDetails["stopCode"]} • ${stopDetails["roadName"]}',
+            //         style: const TextStyle(
+            //           color: Colors.white,
+            //         )),
+            //     preferredSize: Size.fromHeight(5)),
+          ),
+          body: RefreshIndicator(
+            onRefresh: () async {
+              var req = await getRequest(stopDetails["stopCode"],
+                  stopDetails["stopLat"], stopDetails["stopLong"], cache);
+              result = req.toList();
+              setState(() {});
+            },
+            child: ListView.separated(
+              itemCount: result.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  // visualDensity: VisualDensity.comfortable,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    side: BorderSide(color: Color(0xff242526)),
                   ),
-                  const SizedBox(width: 50),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      result[index]["first_Arrival"],
-                      result[index]["first_busType"],
+                  title: Row(
+                    children: <Widget>[
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          SizedBox(
+                              width: 66,
+                              child: Text('${result[index]["bus_Number"]}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 25,
+                                  ))),
+                        ],
+                      ),
+                      const SizedBox(width: 30),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          SizedBox(
+                              width: 50,
+                              child: Center(
+                                  child: result[index]["first_Arrival"])),
+                          SizedBox(
+                              width: 50,
+                              child: Center(
+                                  child: result[index]["first_busType"])),
+                        ],
+                      ),
+                      result[index]["first_isAccessable"],
+                      const SizedBox(width: 20),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          SizedBox(
+                              width: 50,
+                              child: Center(
+                                  child: result[index]["second_Arrival"])),
+                          SizedBox(
+                              width: 50,
+                              child: Center(
+                                  child: result[index]["second_busType"])),
+                        ],
+                      ),
+                      result[index]["second_isAccessable"],
+                      const SizedBox(width: 20),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          SizedBox(
+                              width: 50,
+                              child: Center(
+                                  child: result[index]["third_Arrival"])),
+                          SizedBox(
+                              width: 50,
+                              child: Center(
+                                  child: result[index]["third_busType"])),
+                        ],
+                      ),
+                      result[index]["third_isAccessable"],
                     ],
-                  ),
-                  const SizedBox(width: 50),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      result[index]["second_Arrival"],
-                      result[index]["second_busType"],
-                    ],
-                  ),
-                  const SizedBox(width: 50),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      result[index]["third_Arrival"],
-                      result[index]["third_busType"],
-                    ],
-                  ),
-                ],
-              )
-              /*Text('${result[index]["bus_Number"]}',
+                  )
+                  /*Text('${result[index]["bus_Number"]}',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 25,
                   ))*/
-              ,
-              tileColor: Color(0xff241e30),
-              onTap: () {
-                //insert code here
+                  ,
+                  tileColor: Color(0xff241e30),
+                  onTap: () {
+                    //insert code here
+                  },
+                );
               },
-            );
-          },
-          separatorBuilder: (BuildContext context, int index) =>
-              const Divider(),
-        ),
-      ),
+              separatorBuilder: (BuildContext context, int index) =>
+                  const Divider(),
+            ),
+          )),
       theme: ThemeData(scaffoldBackgroundColor: Color(0xff030303)),
     );
 /*    return Scaffold(
