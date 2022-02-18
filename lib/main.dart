@@ -158,9 +158,9 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => busArrivalRenderScreen(
-                        result: req.toList(),
-                        stopDetails: results[index],
-                      ),
+                          result: req.toList(),
+                          stopDetails: results[index],
+                          cache: rawJson),
                     ));
               },
             );

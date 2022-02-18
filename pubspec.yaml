@@ -39,6 +39,7 @@ dependencies:
   path_provider: ^2.0.8
   sqflite: ^2.0.2
   hexcolor: ^2.0.6
+  flutter_slidable: ^1.2.0
 
 
 dev_dependencies:

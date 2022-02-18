@@ -39,12 +39,20 @@ loadReadable(dispVar) async {
 }
 
 typeReadable(dispVar) async {
-  if (dispVar == "SD") return "Single";
-  if (dispVar == "DD") return "Double";
-  if (dispVar == "BD")
-    return "Bendy";
+  var holder;
+  if (dispVar == "SD")
+    holder = "Single";
+  else if (dispVar == "DD")
+    holder = "Double";
+  else if (dispVar == "BD")
+    holder = "Bendy";
   else
-    return "-";
+    holder = "-";
+  return Text(holder,
+      style: TextStyle(
+        color: Colors.white,
+        fontSize: 15,
+      ));
 }
 
 timeReadable(dispVar, space) async {
@@ -64,7 +72,7 @@ timeReadable(dispVar, space) async {
   return Text(dispVar,
       style: TextStyle(
         color: await loadReadable(space),
-        fontSize: 10,
+        fontSize: 25,
       ));
 }
 
