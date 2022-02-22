@@ -1,6 +1,7 @@
-import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'dart:io';
+
+import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
 Future<String> get _localPath async {
@@ -25,6 +26,8 @@ background() async {
     return convert.jsonDecode(queryRaw.body);
   }
 
+  print('requesting data...');
+
   for (int number = 0; number < 5501; number = number + 500) {
     // print(number);
     var handler = 'http://datamall2.mytransport.sg/ltaodataservice/BusStops?' +
@@ -34,7 +37,6 @@ background() async {
     print(handler);
     var requestLink = await Uri.parse(handler);
     var requestdata = await call(requestLink);
-    print(requestdata);
     for (int i = 0; i < requestdata['value'].length; i++) {
       var builder = {
         'desc': requestdata["value"][i]["Description"],
@@ -43,7 +45,7 @@ background() async {
         'stopLat': requestdata["value"][i]["Latitude"],
         'stopLong': requestdata["value"][i]["Longitude"]
       };
-      print(builder);
+      /*print(builder);*/
       arrayList.add(builder);
     }
   }

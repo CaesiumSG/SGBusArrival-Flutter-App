@@ -1,16 +1,16 @@
 import 'dart:math';
 
-import 'package:busarrival_utilities/pages/newQueryList.dart';
+import 'package:busarrival_utilities/pages/renderbusarrivalpage.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 
-import 'pages/buildNearestList.dart';
 import 'processes/background.dart';
+import 'processes/busarrival.dart';
 import 'processes/fuzzySearch.dart';
 
 void main() async {
   background();
-  runApp(mainPage());
+  runApp(const mainPage());
 }
 
 Icon customIcon = const Icon(Icons.search);
@@ -40,51 +40,11 @@ class homePageWidget extends StatefulWidget {
 
 class homepageState extends State<homePageWidget> {
   var rawJson = [];
-  var results = []; //removed static
-  static var closestStops;
-  static var queryWidget;
+  static var results = [];
+  static var closestStops = [];
 
   Location location = Location();
-  int _selectedIndex = 2;
-  late List<Widget> _widgetSelection;
-  static List<Widget> newWidget = [];
-  void initState() {
-    _widgetSelection = [
-      buildQueryList(dataList: results == null ? [] : results),
-      buildNearestList(dataList: closestStops),
-      Text(
-        'Getting Started: Click the search icon on the appbar to type in a search query!',
-        style: optionStyle,
-      ),
-    ];
-    super.initState();
-  }
-
-/*  rebuildResult() async {
-    _widgetSelection[0] = buildQueryList(dataList: results);
-  }*/
-
-  void recreateQueryWidget() {
-    queryWidget = new nearestListState(dataList: results);
-  }
-
-  rebuildList() async {
-    setState(() {
-      _widgetSelection = [];
-      print('result $results');
-      newWidget = [
-        new buildQueryList(dataList: results),
-        buildNearestList(dataList: closestStops),
-        Text(
-          'Getting Started: Click the search icon on the appbar to type in a search query!',
-          style: optionStyle,
-          textAlign: TextAlign.center,
-        ),
-      ];
-      _widgetSelection = newWidget;
-    });
-    // print(closestStops[0].instanceof);
-  }
+  int _selectedIndex = 0;
 
   fillBody() async {
     /*if (results.length > 0) {
@@ -143,7 +103,13 @@ class homepageState extends State<homePageWidget> {
     if (!_serviceEnabled) {
       _serviceEnabled = await location.requestService();
       if (!_serviceEnabled) {
-        return;
+        return const Center(
+            child:
+                Text('Enable Location Services to see your closes bus stops!',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                    )));
       }
     }
 
@@ -151,7 +117,13 @@ class homepageState extends State<homePageWidget> {
     if (_permissionGranted == PermissionStatus.denied) {
       _permissionGranted = await location.requestPermission();
       if (_permissionGranted != PermissionStatus.granted) {
-        return;
+        return const Center(
+            child: Text(
+                'Grant Location Services Access to see your closes bus stops!',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                )));
       }
     }
 
@@ -177,10 +149,17 @@ class homepageState extends State<homePageWidget> {
         .where((x) =>
             getDist(locLat, locLong, x["stopLat"], x["stopLong"]) < maxRad)
         .toList();
-    //find here is a growable list
-    if (find.length == 0) return;
+    if (find.length == 0) {
+      return const Center(
+          child: Text(
+              'Click the search bar to get started!\nYou are not within 500m of any bus stop!',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+              )));
+    }
     //find is an array of objects
-    List distArray = []; //temp array 1
+    var distArray = []; //temp array 1
     var tempArray = []; //temp array 2
     for (var aa = 0; aa < find.length; aa++) {
       find[aa]["distFromPhone"] = getDist(
@@ -196,92 +175,86 @@ class homepageState extends State<homePageWidget> {
           find[aa][
               "stopLong"])); //adds the distancefromphone value into a new temporary array
     }
-    // print(find[0].instanceof);
     distArray.sort(); //sort the values in the temp array
     for (var newIndex = 0; newIndex < distArray.length; newIndex++) {
       //for each value in the new array
-      var tempObj =
-          find.where((x) => x["distFromPhone"] == distArray[newIndex]).toList();
-      // tempObj = {
-      //   for (var v in l) v[0]: v[1]
-      // }; //match object to value in the new array in ascending order
-      tempArray.add(tempObj[0]); //adds objects into another new temp array
+      var tempObj = find.where((x) =>
+          x["distFromPhone"] ==
+          distArray[
+              newIndex]); //match object to value in the new array in ascending order
+      tempArray.add(tempObj); //adds objects into another new temp array
     }
-    //problem code
-    // print(tempArray[0]["desc"]);
     //by this point the array of objects is sorted, so just clone the final temp array into the original array
-    return tempArray;
+    find = tempArray;
+    closestStops = tempArray;
 /*    for (var aaa = 0; aaa < find.length; aaa++) {
       print(find[aaa]);
     }*/
     //end of Brian sort, time complexity is inf. anyways
   }
 
-  static const TextStyle optionStyle = TextStyle(
-    fontSize: 30,
-    fontWeight: FontWeight.bold,
-    color: Colors.white,
-  );
-
-/*  static List<Widget> _widgetSelection = <Widget>[
-    ListView.separated(
-      // padding: const EdgeInsets.all(8),
-      itemCount: results.length,
-      itemBuilder: (BuildContext context, int index) {
-        return ListTile(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-            side: BorderSide(color: Color(0xff242526)),
-          ),
-          title: Text('${results[index]["desc"]}',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 25,
-              )),
-          subtitle: Text(
-              '${results[index]["stopCode"]} • ${results[index]["roadName"]}',
-              style: const TextStyle(
-                color: Colors.white,
-              )),
-          tileColor: Color(0xff241e30),
-          onTap: () async {
-            print(index);
-            var rawJson = await readJson();
-            var req = await getRequest(results[index]["stopCode"],
-                results[index]["stopLat"], results[index]["stopLong"], rawJson);
-            // print(req);
-            await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => busArrivalRenderScreen(
-                      result: req.toList(),
-                      stopDetails: results[index],
-                      cache: rawJson),
-                ));
-          },
-        );
-      },
-      separatorBuilder: (BuildContext context, int index) => const Divider(),
-    ),
-    buildNearestList(dataList: closestStops),
+  static const TextStyle optionStyle =
+      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+  static List<Widget> widgetSelection = <Widget>[
     Text(
       'Getting Started: Click the search icon on the appbar to type in a search query!',
       style: optionStyle,
     ),
-  ];*/
+    Center(
+      child: ListView.separated(
+        // padding: const EdgeInsets.all(8),
+        itemCount: closestStops.length,
+        itemBuilder: (BuildContext context, int index) {
+          return ListTile(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+              side: BorderSide(color: Color(0xff242526)),
+            ),
+            title: Text('${closestStops[index]["desc"]}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 25,
+                )),
+            subtitle: Text(
+                '${closestStops[index]["stopCode"]} • ${closestStops[index]["roadName"]} (${closestStops[index]["distFromPhone"]}m away)',
+                style: const TextStyle(
+                  color: Colors.white,
+                )),
+            tileColor: Color(0xff241e30),
+            onTap: () async {
+              // print(index);
+              var rawJson = await readJson();
+              var req = await getRequest(
+                  closestStops[index]["stopCode"],
+                  closestStops[index]["stopLat"],
+                  closestStops[index]["stopLong"],
+                  rawJson);
+              // print(req);
+              await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => busArrivalRenderScreen(
+                        result: req.toList(),
+                        stopDetails: closestStops[index],
+                        cache: rawJson),
+                  ));
+            },
+          );
+        },
+        separatorBuilder: (BuildContext context, int index) => const Divider(),
+      ),
+    ),
+    results.isEmpty ? Text("hi") : Text("bye"),
+  ];
 
-  void _onItemTapped(int index) async {
-    print("onItemTapped");
-    if (index == 1) {
-      closestStops = await fillBody();
-    }
-    await rebuildList();
-    // print(closestStops);
+  void _onItemTapped(int index) {
+    print(index);
     setState(() {
       _selectedIndex = index;
+      if (index == 1) {
+        fillBody();
+      }
     });
-
-    // print('hi $_widgetSelection');
   }
 
   getNearestStops() {}
@@ -292,7 +265,6 @@ class homepageState extends State<homePageWidget> {
 
   @override
   Widget build(BuildContext context) {
-    // print(closestStops);
     return Scaffold(
       appBar: AppBar(
         title: customSearchBar,
@@ -310,11 +282,9 @@ class homepageState extends State<homePageWidget> {
                     ),
                     title: TextField(
                       onChanged: (smth) async {
+                        results = [];
                         results = await fuzzySearch(smth);
-                        if (results == null) results = [];
-                        // print('hi $results');
-                        recreateQueryWidget();
-                        rebuildList();
+                        setState(() {});
                       },
                       decoration: InputDecoration(
                         hintText:
@@ -351,7 +321,52 @@ class homepageState extends State<homePageWidget> {
           )
         ],
       ),
-      body: Center(child: _widgetSelection[_selectedIndex]),
+      body: Center(
+        child: ListView.separated(
+          // padding: const EdgeInsets.all(8),
+          itemCount: results.length,
+          itemBuilder: (BuildContext context, int index) {
+            return ListTile(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+                side: BorderSide(color: Color(0xff242526)),
+              ),
+              title: Text('${results[index]["desc"]}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 25,
+                  )),
+              subtitle: Text(
+                  '${results[index]["stopCode"]} • ${results[index]["roadName"]}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                  )),
+              tileColor: Color(0xff241e30),
+              onTap: () async {
+                print(index);
+                var rawJson = await readJson();
+                var req = await getRequest(
+                    results[index]["stopCode"],
+                    results[index]["stopLat"],
+                    results[index]["stopLong"],
+                    rawJson);
+                fillBody();
+                // print(req);
+                await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => busArrivalRenderScreen(
+                          result: req.toList(),
+                          stopDetails: results[index],
+                          cache: rawJson),
+                    ));
+              },
+            );
+          },
+          separatorBuilder: (BuildContext context, int index) =>
+              const Divider(),
+        ),
+      ),
       bottomNavigationBar: ClipRRect(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(30.0),
@@ -381,5 +396,57 @@ class homepageState extends State<homePageWidget> {
       ),
       //bottom nav bar here
     );
+  }
+}
+
+/*
+* bottomNavigationBar: ClipRRect(
+        borderRadius: BorderRadius.only(topLeft: Radius.circular(30.0), topRight: Radius.circular(30.0), ),
+        child:BottomNavigationBar(
+          //elevation: 0.0,
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.white10,*/
+
+/*bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.directions_bus),
+            label: 'Bus Arrivals',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.location_on_rounded),
+            label: 'Nearest Stops',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.star),
+            label: 'Favourites',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.map),
+            label: 'Static',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.amber[800],
+        onTap: _onItemTapped,
+        backgroundColor: const Color(0xff242526),
+        unselectedItemColor: Colors.white,
+      ),*/
+
+class bodyWidget extends StatefulWidget {
+  const bodyWidget({Key? key}) : super(key: key);
+  @override
+  State<StatefulWidget> createState() {
+    // TODO: implement createState
+    throw UnimplementedError();
+  }
+}
+
+class bodyWidgetState extends State<bodyWidget> {
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    throw UnimplementedError();
   }
 }
