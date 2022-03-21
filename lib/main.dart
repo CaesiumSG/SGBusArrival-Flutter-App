@@ -50,7 +50,7 @@ class homepageState extends State<homePageWidget> {
   static List<Widget> newWidget = [];
   void initState() {
     _widgetSelection = [
-      buildQueryList(dataList: results == null ? [] : results),
+      buildQueryList(dataList: []),
       buildNearestList(dataList: closestStops),
       Text(
         'Getting Started: Click the search icon on the appbar to type in a search query!',
@@ -311,10 +311,16 @@ class homepageState extends State<homePageWidget> {
                     title: TextField(
                       onChanged: (smth) async {
                         results = await fuzzySearch(smth);
-                        if (results == null) results = [];
+                        if (results == null) {
+                          print("nothing");
+                          results = [];
+                        }
                         // print('hi $results');
-                        recreateQueryWidget();
-                        rebuildList();
+                        setState(() {
+                          _onItemTapped;
+                        });
+                        // recreateQueryWidget();
+                        // rebuildList();
                       },
                       decoration: InputDecoration(
                         hintText:

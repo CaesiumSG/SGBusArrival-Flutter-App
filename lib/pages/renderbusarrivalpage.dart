@@ -59,13 +59,6 @@ class busTileState extends State<busArrivalRenderScreen> {
                 onPressed: refreshData,
               ),
             ],
-            // bottom: PreferredSize(
-            //     child: Text(
-            //         '${stopDetails["stopCode"]} • ${stopDetails["roadName"]}',
-            //         style: const TextStyle(
-            //           color: Colors.white,
-            //         )),
-            //     preferredSize: Size.fromHeight(5)),
           ),
           body: RefreshIndicator(
             onRefresh: () async {
@@ -143,13 +136,7 @@ class busTileState extends State<busArrivalRenderScreen> {
                       ),
                       result[index]["third_isAccessable"],
                     ],
-                  )
-                  /*Text('${result[index]["bus_Number"]}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 25,
-                  ))*/
-                  ,
+                  ),
                   tileColor: Color(0xff241e30),
                   onTap: () {
                     //insert code here
@@ -162,69 +149,5 @@ class busTileState extends State<busArrivalRenderScreen> {
           )),
       theme: ThemeData(scaffoldBackgroundColor: Color(0xff030303)),
     );
-/*    return Scaffold(
-        appBar: AppBar(
-          title: Text("Parking Details"),
-        ),
-        body: FutureBuilder<ParkingGroup>(
-          future: ParkingService.getParking(),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) print(snapshot.error);
-
-            return snapshot.hasData
-                ? _buildParking(snapshot.data)
-                : Center(child: CircularProgressIndicator());
-          },
-        ));*/
   }
-}
-
-final _parkings = [];
-
-Widget _buildParking(parkingGroup) {
-  _parkings.clear();
-  _parkings.addAll(parkingGroup.groups);
-
-  return ListView.builder(
-    itemCount: _parkings.length,
-    itemBuilder: (context, index) {
-      return _buildRow(_parkings[index], context);
-    },
-  );
-}
-
-Widget _buildRow(parkingGroup, BuildContext context) {
-  return Container(
-    padding: const EdgeInsets.all(16.0),
-    child: Column(
-      // As you expect multiple lines you need a column not a row
-      children: _buildRowList(parkingGroup),
-    ),
-  );
-}
-
-List<Widget> _buildRowList(parkingGroup) {
-  List<Widget> lines = []; // this will hold Rows according to available lines
-  for (var line in parkingGroup.lines) {
-    List<Widget> placesForLine = []; // this will hold the places for each line
-    for (var placeLine in line.places) {
-      placesForLine.add(_buildPlace(placeLine));
-    }
-    lines.add(Row(children: placesForLine));
-  }
-  return lines;
-}
-
-Widget _buildPlace(place) {
-  return Container(
-    padding: const EdgeInsets.only(bottom: 8.0),
-    child: SizedBox(
-      height: 5,
-      width: 5,
-      child: DecoratedBox(
-          decoration: BoxDecoration(
-        border: Border.all(color: Colors.blueAccent),
-      )),
-    ),
-  );
 }

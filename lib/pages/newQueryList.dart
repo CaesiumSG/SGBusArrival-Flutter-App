@@ -12,9 +12,7 @@ class buildQueryList extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() {
-    return new queryListState(dataList: this.dataList);
-  }
+  State<StatefulWidget> createState() => new queryListState(dataList: dataList);
 }
 
 class queryListState extends State<buildQueryList> {
