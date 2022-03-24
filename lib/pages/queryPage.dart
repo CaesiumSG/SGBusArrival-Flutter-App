@@ -1,54 +1,34 @@
 import 'dart:math';
 
 import 'package:busarrival_utilities/pages/renderbusarrivalpage.dart';
-import 'package:busarrival_utilities/processes/notificationService.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 
-import 'database/dbHelper.dart';
-import 'pages/favouritesPage.dart';
-import 'pages/nearestPage.dart';
-import 'processes/background.dart';
-import 'processes/busarrival.dart';
-import 'processes/fuzzySearch.dart';
-
-void main() async {
-  background();
-  runApp(mainPage());
-  await NotificationService().init();
-}
+import '../database/dbHelper.dart';
+import '../processes/busarrival.dart';
+import '../processes/fuzzySearch.dart';
+import 'favouritesPage.dart';
+import 'nearestPage.dart';
 
 Icon customIcon = const Icon(Icons.search);
 Widget customSearchBar = const Text('busArrival Utilities');
 
-class mainPage extends StatelessWidget {
-  const mainPage({Key? key}) : super(key: key);
+var result;
+var stopDetails;
+var cache;
 
-  static const String _title = 'busarrival Utilities';
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: _title,
-      home: homePageWidget(),
-      theme: ThemeData(scaffoldBackgroundColor: Color(0xff030303)),
-    );
-  }
-}
-
-class homePageWidget extends StatefulWidget {
-  const homePageWidget({Key? key}) : super(key: key);
+class queryPage extends StatefulWidget {
+  queryPage({Key? key}) : super(key: key);
 
   @override
-  State<homePageWidget> createState() => homepageState();
+  createState() => queryPageState();
 }
 
-class homepageState extends State<homePageWidget> {
+class queryPageState extends State<queryPage> {
   var rawJson = [];
   var results = []; //removed static
-  static var closestStops = [];
+  static var closestStops;
   static var queryWidget;
-  var recent = [];
 
   Location location = Location();
   int _selectedIndex = 2;
@@ -158,101 +138,6 @@ class homepageState extends State<homePageWidget> {
     fontWeight: FontWeight.bold,
     color: Colors.white,
   );
-
-  returnBody() async {
-    recent = await recentSearchesDB.instance.getAllRecent();
-    if (results.length == 0 && recent.length == 0) {
-      return Text('Recent Searches will be shown here!');
-    } else if (results.length > 0) {
-      return ListView.separated(
-        // padding: const EdgeInsets.all(8),
-        itemCount: results.length,
-        itemBuilder: (BuildContext context, int index) {
-          return ListTile(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-              side: BorderSide(color: Color(0xff242526)),
-            ),
-            title: Text('${results[index]["desc"]}',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 25,
-                )),
-            subtitle: Text(
-                '${results[index]["stopCode"]} • ${results[index]["roadName"]}',
-                style: const TextStyle(
-                  color: Colors.white,
-                )),
-            tileColor: Color(0xff241e30),
-            onTap: () async {
-              var rawJson = await readJson();
-              var req = await getRequest(
-                  results[index]["stopCode"],
-                  results[index]["stopLat"],
-                  results[index]["stopLong"],
-                  rawJson);
-              await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => busArrivalRenderScreen(
-                        result: req.toList(),
-                        stopDetails: results[index],
-                        cache: rawJson),
-                  ));
-            },
-          );
-        },
-        separatorBuilder: (BuildContext context, int index) => const Divider(),
-      );
-    } else {
-      rawJson = await readJson();
-      var x = rawJson.toList();
-      var hit = [];
-      for (var a = 0; a < x.length; a++) {
-        var temp = await (x.firstWhere((i) =>
-            i['stopCode'] == x[a]['stopcode'].toString())); //returns stop data
-        hit.add(temp); //returns array of object (stop data)
-      }
-
-      return ListView.separated(
-        // padding: const EdgeInsets.all(8),
-        itemCount: recent.length,
-        itemBuilder: (BuildContext context, int index) {
-          return ListTile(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-              side: BorderSide(color: Color(0xff242526)),
-            ),
-            title: Text('${hit[index]["desc"]}',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 25,
-                )),
-            subtitle:
-                Text('${hit[index]["stopCode"]} • ${hit[index]["roadName"]}',
-                    style: const TextStyle(
-                      color: Colors.white,
-                    )),
-            tileColor: Color(0xff241e30),
-            onTap: () async {
-              var rawJson = await readJson();
-              var req = await getRequest(hit[index]["stopCode"],
-                  hit[index]["stopLat"], hit[index]["stopLong"], rawJson);
-              await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => busArrivalRenderScreen(
-                        result: req.toList(),
-                        stopDetails: hit[index],
-                        cache: rawJson),
-                  ));
-            },
-          );
-        },
-        separatorBuilder: (BuildContext context, int index) => const Divider(),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -411,9 +296,8 @@ class homepageState extends State<homePageWidget> {
                 await Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => nearestPage(
-                              pissed: closestStops,
-                            )));
+                        builder: (context) =>
+                            nearestPage(pissed: closestStops)));
                 Navigator.pop(context);
               },
             ),
@@ -442,12 +326,14 @@ class homepageState extends State<homePageWidget> {
                   )),
               tileColor: Color(0xff241e30),
               onTap: () async {
+                print(index);
                 var rawJson = await readJson();
                 var req = await getRequest(
                     results[index]["stopCode"],
                     results[index]["stopLat"],
                     results[index]["stopLong"],
                     rawJson);
+                print(req);
                 await Navigator.push(
                     context,
                     MaterialPageRoute(

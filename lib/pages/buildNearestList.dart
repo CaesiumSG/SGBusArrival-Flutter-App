@@ -27,7 +27,7 @@ class nearestListState extends State<buildNearestList> {
 
   @override
   Widget build(BuildContext context) {
-    print('bye ${dataList}');
+    // print('bye ${dataList}');
     return ListView.separated(
       // padding: const EdgeInsets.all(8),
       itemCount: dataList.length,

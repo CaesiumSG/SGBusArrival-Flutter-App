@@ -41,6 +41,9 @@ dependencies:
   hexcolor: ^2.0.6
   flutter_slidable: ^1.2.0
   location: ^4.3.0
+  fluttertoast: ^8.0.9
+  flutter_local_notifications: ^9.4.0
+  timezone: ^0.8.0
 
 
 dev_dependencies:

@@ -33,9 +33,9 @@ Future readJson() async {
 }
 
 Future determineSearchTermType(String food) async {
-  if (food.length < 2) return 0;
-  if (food.length == 5 && (int.tryParse(food) != null)) return 3;
-  if (int.tryParse(food) != null)
+  if (food.length < 2) return 0; //lesser than 2
+  if (food.length == 5 && (int.tryParse(food) != null)) return 3; //stopcode
+  if (int.tryParse(food) != null) //if search term is a number
     return 2;
   else
     return 1;

@@ -23,6 +23,6 @@ getRequest(stop, lat, long, rawJson) async {
       'http://datamall2.mytransport.sg/ltaodataservice/BusArrivalv2?BusStopCode=${stop}&ServiceNo=');
   var requestdata = await call(url);
   var output = await resultParser(requestdata, rawJson); //returns an array
-  print(output);
+  // print(output);
   return output;
 }
