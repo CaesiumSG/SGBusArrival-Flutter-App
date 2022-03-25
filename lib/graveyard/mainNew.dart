@@ -4,10 +4,10 @@ import 'package:busarrival_utilities/pages/renderbusarrivalpage.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 
-import 'pages/buildNearestList.dart';
-import 'processes/background.dart';
-import 'processes/busarrival.dart';
-import 'processes/fuzzySearch.dart';
+import '../processes/background.dart';
+import '../processes/busarrival.dart';
+import '../processes/fuzzySearch.dart';
+import 'buildNearestList.dart';
 
 void main() async {
   background();

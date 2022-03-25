@@ -354,12 +354,12 @@ class homepageState extends State<homePageWidget> {
                   stopListNoDuplicates.add(starred[aa]["starredStopCode"]);
                 }
 
-                stopListNoDuplicates =
-                    stopListNoDuplicates.toSet().toList(); //removes duplicates
+                stopListNoDuplicates = stopListNoDuplicates.toSet().toList();
+                //removes duplicates
 
                 for (var a = 0; a < stopListNoDuplicates.length; a++) {
                   var temp = await (listJson.firstWhere((i) =>
-                      i['stopCode'] ==
+                      i['stopCode'].toString() ==
                       stopListNoDuplicates[a].toString())); //returns stop data
                   foundData.add(temp); //returns array of object (stop data)
                 }

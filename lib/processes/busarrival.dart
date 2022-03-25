@@ -1,6 +1,3 @@
-//fuck me
-//emme if you touch this im gonna wack u
-
 import 'dart:convert' as convert;
 
 import 'package:http/http.dart' as http;

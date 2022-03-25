@@ -237,6 +237,7 @@ class busTileState extends State<busArrivalRenderScreen> {
                   },
                   onLongPress: () async {},
                   trailing: PopupMenuButton(
+                      color: Colors.blue,
                       itemBuilder: (_) => <PopupMenuItem<String>>[
                             PopupMenuItem<String>(
                                 child: Text('Notify me'), value: 'notify'),
