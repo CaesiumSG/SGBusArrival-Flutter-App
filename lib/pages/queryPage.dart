@@ -79,7 +79,7 @@ class queryPageState extends State<queryPage> {
                       cos(phoneLong * pi / 180) * cos(targetLong * pi / 180))) *
           6371000;
       return x.round();
-    }
+    } //i am very proud of this one
 
     _locationData = await location.getLocation();
     var locLat = _locationData.latitude;
