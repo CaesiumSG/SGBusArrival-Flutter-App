@@ -242,9 +242,6 @@ class busTileState extends State<busArrivalRenderScreen> {
                             PopupMenuItem<String>(
                                 child: Text('Notify me'), value: 'notify'),
                             PopupMenuItem<String>(
-                                child: Text('Schedule this bus'),
-                                value: 'schedule'),
-                            PopupMenuItem<String>(
                                 child: Text('Star/Unstar this bus stop'),
                                 value: 'star'),
                           ],
