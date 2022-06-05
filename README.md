@@ -1,3 +1,3 @@
 # busarrival_utilities
 
-compsci IA
+Computer Science IA submission. Contains your mom inside
