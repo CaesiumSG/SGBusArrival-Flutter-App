@@ -1,4 +1,4 @@
-# busarrival_utilities
+# SGBusArrival Android Application (Flutter)
 
 Computer Science Internal Assessment for IB.
 
